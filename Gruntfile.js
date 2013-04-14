@@ -68,6 +68,8 @@ module.exports = function (grunt) {
                     middleware: function (connect) {
                         return [
                             mountFolder(connect, '.tmp'),
+                            mountFolder(connect, 'app/components'),
+                            mountFolder(connect, 'node_modules'),
                             mountFolder(connect, 'test')
                         ];
                     }
@@ -106,7 +108,6 @@ module.exports = function (grunt) {
         mocha: {
             all: {
                 options: {
-                    run: true,
                     urls: ['http://localhost:<%= connect.options.port %>/index.html']
                 }
             }
@@ -126,9 +127,10 @@ module.exports = function (grunt) {
             test: {
                 files: [{
                     expand: true,
-                    cwd: '.tmp/spec',
-                    src: '*.coffee',
-                    dest: 'test/spec'
+                    cwd: 'test',
+                    src: ['**/*.coffee'],
+                    dest: '.tmp',
+                    ext: '.js'
                 }]
             }
         },
@@ -148,9 +150,6 @@ module.exports = function (grunt) {
                     debugInfo: true
                 }
             }
-        },
-        cucumberjs: {
-            files: 'features'
         },
         // not used since Uglify task does concat,
         // but still available if needed
@@ -271,19 +270,11 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', [
         'clean:server',
-        'coffee',
+        'coffee:test',
         'compass',
         'connect:test',
-        'mocha',
-        'cucumberjs'
-    ]);
-
-    grunt.registerTask('acceptance', [
-        'clean:server',
-        'coffee:dist',
-        'compass:server',
-        'connect:dist',
-        'cucumberjs'
+        'open',
+        'mocha'
     ]);
 
     grunt.registerTask('build', [
